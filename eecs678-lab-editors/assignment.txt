@@ -1,0 +1,35 @@
+1. Open up simple.c using <Ctrl+o> and then selecting simple.c. To copy the
+first 12 lines, put your cursor at the start of the first line. Holding the
+shift key down, press the down key 12 times. Still holding down the shift key,
+press the end key.
+
+Hit <Ctrl+c> to copy the lines.
+
+Hit <ctrl+n> to open a new file. Hit <ctrl+v> to paste the lines, then
+<ctrl+s> to save the file, typing in 'a.c' as the name of the file. Hit enter.
+
+Repeat these steps 2 more times, replacing 'a.c' with 'b.c' and 'c.c'.
+
+2. To open a second pane, hit <shift+alt+2>. You should automatically be in
+the second pane. Hit <ctrl+n> to open a new file in this window. Hit <ctrl+1>
+to switch back to the first pane. Hit <ctrl+2> to switch to the second pane.
+To switch to the terminal, open up a terminal shell and then use <alt+tab> to
+switch between it and sublime text.
+
+3. To find the original definition of this function, use <ctrl+shift+f> to
+search across multiple files/directories. Input the name of the function, then
+hit enter. Find the name of the file containing the original definition out of
+the returned results, then open that file using <ctrl+p> then typing in the
+name of the file. Use <ctrl+w> to close that file and the search results
+window, and you will be back in the original file.
+
+4. To remove all whitespace from the front of the file, use <ctrl+f>. Press
+<alt+r> to switch to regex mode. Input "^\s*" into the find bar, then hit
+<alt+enter> to select all instances of whitespace at the front of the file.
+Hit <backspace> to remove the whitespace.
+
+5. To replace "Bill Self" in the source file, hit <ctrl+f> again. Type "Bill
+Self" into the search bar, then use <alt+enter> to select all instances. Type
+in "basketball genius Bill Self" to replace all instances. To then reformat
+the file to fit the specified size, hit <ctrl+a> to select all text. Then use
+<alt+q> to reformat all selected text.
