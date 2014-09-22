@@ -6,7 +6,7 @@
 #include <sys/wait.h>
 #include <string.h>
 
-#define BSIZE 256
+#define BSIZE 4096
 
 #define BASH_EXEC  "/bin/bash"
 #define FIND_EXEC  "/bin/find"
@@ -18,12 +18,13 @@
 int main(int argc, char *argv[])
 {
   int pipefd[2];
+  char buf;
   if (pipe(pipefd) == -1){
     perror("pipe");
     exit(1);
   }
   int status;
-  char buf;
+  // char buf;
   pid_t pid_1, pid_2, pid_3, pid_4;
 
   if (argc != 4) {
@@ -37,36 +38,78 @@ int main(int argc, char *argv[])
     char cmdbuf[BSIZE];
     bzero(cmdbuf, BSIZE);
     sprintf(cmdbuf, "%s %s -name \'*\'.[ch]", FIND_EXEC, argv[1]);
-
-    close(pipefd[0]); // don't need to read
-    write(pipefd[1], cmdbuf, strlen(cmdbuf));
-    close(pipefd[1]);          /* Reader will see EOF */   
-    exit(0);
+    close(pipefd[0]);
+    dup2(pipefd[1], STDOUT_FILENO);
+    // write(pipefd[1], "testing", strlen("testing"));
+    close(pipefd[1]);
+    if ( (execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char *) 0)) < 0) {
+      fprintf(stderr, "\nError execing find. ERROR#%d\n", errno);
+      return EXIT_FAILURE;
+    }
   }
 
   pid_2 = fork();
   if (pid_2 == 0) {
     /* Second Child */
     char cmdbuf[BSIZE];
+    char tmpbuf[BSIZE];
     bzero(cmdbuf, BSIZE);
-    sprintf(cmdbuf, "%s %s -name \'*\'.[ch]", FIND_EXEC, argv[1]);
-    while (read(pipefd[0], &buf, 1) > 0)
-      write(STDOUT_FILENO, &buf, 1);
+    bzero(tmpbuf, BSIZE);
 
-    write(STDOUT_FILENO, "\n", 1);
-
+    read(pipefd[0], tmpbuf, BUFSIZ);
+    write(STDOUT_FILENO, tmpbuf, BUFSIZ);
+    sprintf(cmdbuf, "%s %s -c %s", XARGS_EXEC, GREP_EXEC, argv[2]);
+    // dup2(pipefd[0], STDOUT_FILENO);
+    // dup2(pipefd[1], STDOUT_FILENO);
+    close(pipefd[1]);
+    close(pipefd[0]);
     exit(0);
+    // if ( (execl(BASH_EXEC, BASH_EXEC, "-c", cmdbuf, (char *) 0)) < 0) {
+    //   fprintf(stderr, "\nError execing grep. ERROR#%d\n", errno);
+    //   return EXIT_FAILURE;
+    // }
   }
 
   pid_3 = fork();
   if (pid_3 == 0) {
-    /* Third Child */
+    char cmdbuf[BSIZE];
+    bzero(cmdbuf, BSIZE);
+    // read(pipefd[0], cmdbuf, BSIZE);
+      // write(STDOUT_FILENO, &buf, 1);
+    // int newpipefd[2];
+    // dup2(pipefd, newpipefd);
+    // write(STDOUT_FILENO, cmdbuf, BSIZE);
+    // write(STDOUT_FILENO, "\n", 1);
+    bzero(cmdbuf, BSIZE);
+    sprintf(cmdbuf, "process3->process4");
+
+    // write(pipefd[1], cmdbuf, BSIZE);
+    
+    close(pipefd[1]);
+    close(pipefd[0]);
     exit(0);
   }
 
   pid_4 = fork();
   if (pid_4 == 0) {
     /* Fourth Child */
+    char cmdbuf[BSIZE];
+    bzero(cmdbuf, BSIZE);
+    // sprintf(cmdbuf, "%s %s -name \'*\'.[ch]", FIND_EXEC, argv[1]);
+    // while (read(pipefd[0], &buf, 1) > 0)
+    // read(pipefd[0], cmdbuf, BSIZE);
+      // write(STDOUT_FILENO, &buf, 1);
+    // int newpipefd[2];
+    // dup2(pipefd, newpipefd);
+    // write(STDOUT_FILENO, cmdbuf, BSIZE);
+    // write(STDOUT_FILENO, "\n", 1);
+    bzero(cmdbuf, BSIZE);
+    sprintf(cmdbuf, "process2->process3");
+
+    // write(pipefd[1], cmdbuf, BSIZE);
+    
+    close(pipefd[1]);
+    close(pipefd[0]);
     exit(0);
   }
 
